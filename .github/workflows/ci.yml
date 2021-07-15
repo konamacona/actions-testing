@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    tags:
+      - "V*"
+  release:
+    types:
+      - published
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master 
+      - name: Get Previous tag
+        id: previoustag
+        uses: WyriHaximus/github-action-get-previous-tag@v1
+        with:
+          fallback: "VERSION UNKNOWN" # Optional fallback tag to use when no tag can be found
+      - name: Sets the version to last tag
+        run: echo "REACT_APP_VERSION=${{steps.previoustag.outputs.tag}}" >> $GITHUB_ENV
+      - name: Log env vars for testing # Uncomment this and comment below for testing
+        run: |
+          echo "::debug::${{github.event_name}}"
+          echo "::debug::${{github.ref}}"
+          echo "::debug::$(cat $GITHUB_ENV)"
